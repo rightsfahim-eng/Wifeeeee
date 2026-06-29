@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy Birthday Nusrat 🎉</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap');
+
+  @font-face {
+    font-family: 'BanglaFont';
+    src: url('bangla.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #1a0020 0%, #0a000f 100%);
+    font-family: 'Comic Neue', 'Bangers', cursive;
+    overflow-x: hidden;
+    animation: pageSwing 6s ease-in-out infinite;
+    transform-origin: center center;
+  }
+
+  @keyframes pageSwing {
+    0%,100% { transform: rotate(0deg) scale(1); }
+    20%      { transform: rotate(0.4deg) scale(1.004); }
+    50%      { transform: rotate(-0.3deg) scale(0.998); }
+    75%      { transform: rotate(0.2deg) scale(1.002); }
+  }
+
+  /* ── Fireworks canvas ── */
+  #fw-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* ── Album layout ── */
+  .album {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 32px;
+    padding: 48px 5vw 60px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* card: top-left */
+  .card-top-left  { grid-column: 1; grid-row: 1; }
+  /* card: right middle — spans both rows */
+  .card-right     { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+  /* card: bottom-left */
+  .card-bot-left  { grid-column: 1; grid-row: 2; }
+
+  .wish-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,100,180,0.25);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 40px rgba(200,0,100,0.15);
+  }
+
+  .wish-card img {
+    width: 100%;
+    border-radius: 14px;
+    object-fit: cover;
+    max-height: 260px;
+    box-shadow: 0 4px 20px rgba(255,50,130,0.3);
+  }
+
+  .wish-text {
+    font-family: 'BanglaFont', 'Comic Neue', cursive;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    color: #ffb3d9;
+    line-height: 1.85;
+    text-shadow: 0 0 8px rgba(255,80,160,0.4);
+  }
+
+  @media (max-width: 600px) {
+    .album {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      padding: 28px 5vw 40px;
+    }
+    .card-right { grid-column: 1; grid-row: auto; }
+    .card-bot-left { grid-column: 1; grid-row: auto; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fw-canvas"></canvas>
+
+<div class="album">
+
+  <!-- Top Left -->
+  <div class="wish-card card-top-left">
+    <img src="photo.xs.png" alt="photo 1" />
+    <div class="wish-text">
+      তোমার হাসিতে আমার পুরো দুনিয়া আলো হয়ে যায়।<br>
+      জন্মদিনে তোমার জন্য শুধু ভালোবাসা আর দোয়া।<br>
+      Happy Birthday Nusrat 🦋💖
+    </div>
+  </div>
+
+  <!-- Right (tall) -->
+  <div class="wish-card card-right">
+    <img src="photo.xs2.png" alt="photo 2" style="max-height:340px;" />
+    <div class="wish-text">
+      তুমি আমার সব থেকে সুন্দর অনুভূতির নাম।<br>
+      তোমার প্রতিটি মুহূর্ত যেন সোনার চেয়েও দামী।<br>
+      আজ তোমার দিন — তুমি আনন্দে থাকো সবসময়।<br>
+      I Love You, Meri Jan 🌸✨
+    </div>
+  </div>
+
+  <!-- Bottom Left -->
+  <div class="wish-card card-bot-left">
+    <img src="photo.xs3.png" alt="photo 3" />
+    <div class="wish-text">
+      এই জীবনে তোমার মতো কেউ নেই।<br>
+      তুমি আমার রাতের চাঁদ, দিনের রোদ।<br>
+      জন্মদিনে অনেক ভালোবাসা নাও 💕🎂
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Rectangular sparkle fireworks ──
+const canvas = document.getElementById('fw-canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+
+const COLORS = [
+  '#ff3385','#ff69b4','#ffb3d9','#ff0066',
+  '#fff','#ffe0f0','#ff99cc','#c0006a',
+  '#ffdd00','#ff6600'
+];
+
+function spawnBurst(x, y, count = 55) {
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.random() * Math.PI * 2);
+    const speed = 3 + Math.random() * 9;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - (Math.random() * 4), // bias upward
+      w: 3 + Math.random() * 7,
+      h: 2 + Math.random() * 4,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: 1,
+      life: 0.016 + Math.random() * 0.012,
+      gravity: 0.18 + Math.random() * 0.1,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.25
+    });
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x    += p.vx;
+    p.y    += p.vy;
+    p.vy   += p.gravity;
+    p.alpha -= p.life;
+    p.angle += p.spin;
+
+    if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Initial burst from bottom center
+function initialBlast() {
+  const cx = canvas.width / 2;
+  const cy = canvas.height;
+  for (let b = 0; b < 5; b++) {
+    setTimeout(() => {
+      spawnBurst(cx + (Math.random() - 0.5) * 120,
+                 cy - Math.random() * 80, 70);
+    }, b * 120);
+  }
+}
+initialBlast();
+
+// Ongoing random bursts
+setInterval(() => {
+  const x = canvas.width  * (0.2 + Math.random() * 0.6);
+  const y = canvas.height * (0.1 + Math.random() * 0.6);
+  spawnBurst(x, y, 40);
+}, 1800);
+</script>
+</body>
+</html>
